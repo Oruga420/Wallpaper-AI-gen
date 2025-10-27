@@ -11,7 +11,7 @@ const App: React.FC = () => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [isRemixing, setIsRemixing] = useState(false);
   const [remixPrompt, setRemixPrompt] = useState('');
   const [useThinkingMode, setUseThinkingMode] = useState(false);
@@ -37,17 +37,20 @@ const App: React.FC = () => {
   };
 
   const handleRemix = async () => {
-    if (!selectedImage || !remixPrompt) {
+    if (selectedImageIndex === null || !remixPrompt) {
       setError('Remix prompt cannot be empty.');
       return;
     }
     setIsRemixing(true);
     setError(null);
     try {
-      const remixed = await remixImage(remixPrompt, selectedImage, useThinkingMode);
-      const updatedImages = generatedImages.map(img => img === selectedImage ? remixed : img);
+      const imageToRemix = generatedImages[selectedImageIndex];
+      const remixed = await remixImage(remixPrompt, imageToRemix, useThinkingMode);
+      
+      const updatedImages = [...generatedImages];
+      updatedImages[selectedImageIndex] = remixed;
+
       setGeneratedImages(updatedImages);
-      setSelectedImage(remixed); // show the new image in the modal
       setRemixPrompt('');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'An unknown error occurred during remix.');
@@ -57,13 +60,25 @@ const App: React.FC = () => {
     }
   };
   
-  const handleSelectImage = (base64Image: string) => {
-    setSelectedImage(base64Image);
+  const handleSelectImage = (index: number) => {
+    setSelectedImageIndex(index);
   };
 
   const handleCloseModal = () => {
-    setSelectedImage(null);
+    setSelectedImageIndex(null);
     setRemixPrompt('');
+  };
+
+  const handleNextImage = () => {
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex((prevIndex) => (prevIndex! + 1) % generatedImages.length);
+    }
+  };
+
+  const handlePrevImage = () => {
+      if (selectedImageIndex !== null) {
+          setSelectedImageIndex((prevIndex) => (prevIndex! - 1 + generatedImages.length) % generatedImages.length);
+      }
   };
 
   const handleReferenceImageChange = (index: number, image: ReferenceImage | null) => {
@@ -93,17 +108,19 @@ const App: React.FC = () => {
           isLoading={isLoading}
           onImageClick={handleSelectImage}
         />
-        {selectedImage && (
+        {selectedImageIndex !== null && (
           <ImageModal
-            isOpen={!!selectedImage}
+            isOpen={selectedImageIndex !== null}
             onClose={handleCloseModal}
-            image={selectedImage}
+            image={generatedImages[selectedImageIndex]}
             onRemix={handleRemix}
             remixPrompt={remixPrompt}
             setRemixPrompt={setRemixPrompt}
             isRemixing={isRemixing}
             useThinkingMode={useThinkingMode}
             setUseThinkingMode={setUseThinkingMode}
+            onNext={handleNextImage}
+            onPrev={handlePrevImage}
           />
         )}
       </main>

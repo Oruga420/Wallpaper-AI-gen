@@ -3,7 +3,7 @@ import React from 'react';
 interface ImageGridProps {
   images: string[];
   isLoading: boolean;
-  onImageClick: (base64Image: string) => void;
+  onImageClick: (index: number) => void;
 }
 
 export const ImageGrid: React.FC<ImageGridProps> = ({ images, isLoading, onImageClick }) => {
@@ -31,7 +31,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({ images, isLoading, onImage
   return (
     <div className="image-grid">
       {images.map((base64Image, index) => (
-        <div key={index} className="image-container" onClick={() => onImageClick(base64Image)}>
+        <div key={index} className="image-container" onClick={() => onImageClick(index)}>
           <img src={`data:image/png;base64,${base64Image}`} alt={`Generated wallpaper ${index + 1}`} />
           <div className="overlay">Click to Remix</div>
         </div>

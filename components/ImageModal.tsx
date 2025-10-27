@@ -10,6 +10,8 @@ interface ImageModalProps {
   isRemixing: boolean;
   useThinkingMode: boolean;
   setUseThinkingMode: (use: boolean) => void;
+  onNext: () => void;
+  onPrev: () => void;
 }
 
 export const ImageModal: React.FC<ImageModalProps> = ({
@@ -22,6 +24,8 @@ export const ImageModal: React.FC<ImageModalProps> = ({
   isRemixing,
   useThinkingMode,
   setUseThinkingMode,
+  onNext,
+  onPrev,
 }) => {
   if (!isOpen) {
     return null;
@@ -42,7 +46,11 @@ export const ImageModal: React.FC<ImageModalProps> = ({
         <button className="close-btn" onClick={onClose}>×</button>
         <div className="modal-image-container">
           {isRemixing && <div className="remix-spinner-overlay"><div className="spinner"></div><p>Remixing...</p></div>}
+          
+          <button className="nav-arrow prev" onClick={(e) => { e.stopPropagation(); onPrev(); }} aria-label="Previous image">‹</button>
           <img src={`data:image/png;base64,${image}`} alt="Selected wallpaper" />
+          <button className="nav-arrow next" onClick={(e) => { e.stopPropagation(); onNext(); }} aria-label="Next image">›</button>
+
         </div>
         <div className="modal-controls">
           <h2>Remix Image</h2>
@@ -62,6 +70,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({
                   onChange={(e) => setUseThinkingMode(e.target.checked)}
                   disabled={isRemixing}
                 />
+                <span />
                 Enable Thinking Mode (for complex edits)
               </label>
             </div>
