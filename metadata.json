@@ -1,0 +1,5 @@
+{
+  "name": "Harley's Wallpaper Mayhem",
+  "description": "A wallpaper generator inspired by Harley Quinn. Upload up to two style reference images and use a text prompt to generate four unique wallpapers with Gemini. View, navigate, and remix your creations in a gallery.",
+  "requestFramePermissions": []
+}
